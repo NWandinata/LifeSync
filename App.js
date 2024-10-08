@@ -2,9 +2,43 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
+import * as Calendar from 'expo-calendar';
 
 /*import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';*/
+
+async function getDefaultCalendarSource() {
+  const calendars = await Calendar.getCalendarsAsync(
+    Calendar.EntityTypes.EVENT
+  );
+  const defaultCalendars = calendars.filter(
+    (each) => each.source.name === 'Default'
+  );
+  return defaultCalendars.length
+    ? defaultCalendars[0].source
+    : calendars[0].source;
+}
+
+async function createCalendar() {
+  const defaultCalendarSource =
+    Platform.OS === 'ios'
+      ? await getDefaultCalendarSource()
+      : { isLocalAccount: true, name: 'Expo Calendar' };
+  const newCalendarID = await Calendar.createCalendarAsync({
+    title: 'Expo Calendar',
+    color: 'blue',
+    entityType: Calendar.EntityTypes.EVENT,
+    sourceId: defaultCalendarSource.id,
+    source: defaultCalendarSource,
+    name: 'internalCalendarName',
+    ownerAccount: 'personal',
+    accessLevel: Calendar.CalendarAccessLevel.OWNER,
+  });
+  console.log(`Your new calendar ID is: ${newCalendarID}`);
+
+  // Used later to add events
+  return newCalendarID;
+}
 
 export default function App() {
   /*return (
@@ -13,17 +47,58 @@ export default function App() {
       <StatusBar style="auto" />
     </View>
   );*/
-  
+
   const [selectedStartDate, setSelectedStartDate] = useState(null);
+
+  // Used for adding a friend's birthday to the calendar
+  const [friendNameText, setFriendNameText] = useState('');
+
+  // Check if the user has selected a date
   const startDate = selectedStartDate
     ? selectedStartDate.format('YYYY-MM-DD').toString()
     : '';
+  
+  // Checks calendar permissions 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === 'granted') {
+        const calendars = await Calendar.getCalendarsAsync(
+          Calendar.EntityTypes.EVENT
+        );
+        console.log('Here are all your calendars:');
+        console.log({ calendars });
+      }
+    })();
+  }, []);
+
+  const addNewEvent = async () => {
+    try {
+      const calendarId = await createCalendar();
+      
+      const res = await Calendar.createEventAsync(calendarId, {
+        endDate: getAppointementDate(startDate),
+        startDate: getAppointementDate(startDate),
+        title: 'Happy Birthday buddy ' + friendNameText,
+      });
+      Alert.alert('Event Created!');
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style='auto' />
+      <TextInput
+        onChangeText={setFriendNameText}
+        value={friendNameText}
+        placeholder='Enter the name of your friend'
+        style={styles.input}
+      />
       <CalendarPicker onDateChange={setSelectedStartDate} />
       <Text style={styles.dateText}>Birthday: {startDate}</Text>
+      <Button title={'Add to calendar'} onPress={addNewEvent} />
     </View>
   );
 }
@@ -34,5 +109,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+  },
+  dateText: {
+    margin: 16,
   },
 });
