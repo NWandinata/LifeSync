@@ -9,8 +9,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-community/slider": "^4.5.5",
+    "@react-native-picker/picker": "^2.9.0",
     "date-fns": "^4.1.0",
     "expo": "~51.0.28",
+    "expo-calendar": "~13.0.5",
     "expo-cli": "^6.3.12",
     "expo-status-bar": "~1.12.1",
     "global": "^4.4.0",
@@ -18,7 +21,7 @@
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-calendar-picker": "^8.0.5",
-    "expo-calendar": "~13.0.5"
+    "react-native-calendars": "^1.1307.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0"
