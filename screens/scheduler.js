@@ -3,11 +3,16 @@ import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-nativ
 import Slider from '@react-native-community/slider';
 import { Picker } from '@react-native-picker/picker';
 
-export default function Scheduler() {
+export default function SchedulerScreen({ navigation, route }) {
+    const { date } = route.params;
     const [eventName, setEventName] = useState('');
     const [priority, setPriority] = useState(1);
     const [category, setCategory] = useState('Work');
     const [events, setEvents] = useState([]);
+
+    /*const creatEventString = () => {
+        const eventString = eventName + "\nPriority: " + priority + "\nCategory: " + category + "\nPriority: "
+    };*/
 
     const addEvent = () => {
         if (eventName.trim() !== '') {
@@ -19,6 +24,9 @@ export default function Scheduler() {
             };
             setEvents((currentEvents) => [...currentEvents, newEvent]);
             setEventName(''); // Clear the input
+
+            // Carries event info back to the calendar
+            navigation.navigate("Calendar", { eventInfo: newEvent, newEvent: true });
         } else {
             alert('Please enter an event name.');
         }
@@ -71,6 +79,9 @@ export default function Scheduler() {
                     </View>
                 )}
             />
+            <Text style={styles.selectedDateText}>
+                Selected Date: {date}
+            </Text>
         </View>
     );
 }
@@ -102,6 +113,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: '100%',
         marginBottom: 20,
+        flex: 1,
     },
     list: {
         marginTop: 20,
@@ -110,5 +122,11 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
+    },
+    selectedDateText: {
+        fontSize: 18,
+        color: 'black',
+        marginVertical: 10,
+        marginHorizontal: 80,
     },
 });
