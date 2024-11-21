@@ -10,10 +10,6 @@ export default function SchedulerScreen({ navigation, route }) {
     const [category, setCategory] = useState('Work');
     const [events, setEvents] = useState([]);
 
-    /*const creatEventString = () => {
-        const eventString = eventName + "\nPriority: " + priority + "\nCategory: " + category + "\nPriority: "
-    };*/
-
     const addEvent = () => {
         if (eventName.trim() !== '') {
             const newEvent = {
