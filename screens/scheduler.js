@@ -8,7 +8,11 @@ export default function SchedulerScreen({ navigation, route }) {
     const [eventName, setEventName] = useState('');
     const [priority, setPriority] = useState(1);
     const [category, setCategory] = useState('Work');
+    const [dueTime, setDueTime] = useState('12:00');
     const [events, setEvents] = useState([]);
+
+    const hours = Array.from({ length: 24 }, (_, i) => (i < 10 ? `0${i}` : `${i}`));
+    const minutes = Array.from({ length: 60 }, (_, i) => (i < 10 ? `0${i}` : `${i}`));
 
     const addEvent = () => {
         if (eventName.trim() !== '') {
@@ -16,12 +20,13 @@ export default function SchedulerScreen({ navigation, route }) {
                 id: Math.random().toString(),
                 name: eventName,
                 priority: priority,
-                category: category
+                category: category,
+                dueTime: dueTime,
             };
             setEvents((currentEvents) => [...currentEvents, newEvent]);
             setEventName(''); // Clear the input
 
-            // Carries event info back to the calendar
+            // Pass event info, including dueTime, back to the calendar
             navigation.navigate("Calendar", { eventInfo: newEvent, newEvent: true });
         } else {
             alert('Please enter an event name.');
@@ -51,7 +56,7 @@ export default function SchedulerScreen({ navigation, route }) {
             <Text style={styles.label}>Category:</Text>
             <Picker
                 selectedValue={category}
-                style={styles.picker}
+                style={styles.categoryPicker}
                 onValueChange={(itemValue) => setCategory(itemValue)}
             >
                 <Picker.Item label="Work" value="Work" />
@@ -60,6 +65,29 @@ export default function SchedulerScreen({ navigation, route }) {
                 <Picker.Item label="Personal" value="Personal" />
                 <Picker.Item label="Other" value="Other" />
             </Picker>
+
+            <Text style={styles.label}>Set Due Time:</Text>
+            <View style={styles.timePickerContainer}>
+                <Picker
+                    selectedValue={dueTime.split(':')[0]}
+                    style={styles.timePicker}
+                    onValueChange={(hour) => setDueTime(`${hour}:${dueTime.split(':')[1]}`)}
+                >
+                    {hours.map((hour) => (
+                        <Picker.Item key={hour} label={hour} value={hour} />
+                    ))}
+                </Picker>
+                <Text style={styles.timeSeparator}>:</Text>
+                <Picker
+                    selectedValue={dueTime.split(':')[1]}
+                    style={styles.timePicker}
+                    onValueChange={(minute) => setDueTime(`${dueTime.split(':')[0]}:${minute}`)}
+                >
+                    {minutes.map((minute) => (
+                        <Picker.Item key={minute} label={minute} value={minute} />
+                    ))}
+                </Picker>
+            </View>
 
             <Button title="Add Event" onPress={addEvent} />
 
@@ -70,14 +98,12 @@ export default function SchedulerScreen({ navigation, route }) {
                 renderItem={({ item }) => (
                     <View style={styles.eventItem}>
                         <Text>
-                            Event: {item.name} | Priority: {item.priority} | Category: {item.category}
+                            Event: {item.name} | Priority: {item.priority} | Category: {item.category} | Due: {item.dueTime}
                         </Text>
                     </View>
                 )}
             />
-            <Text style={styles.selectedDateText}>
-                Selected Date: {date}
-            </Text>
+            <Text style={styles.selectedDateText}>Selected Date: {date}</Text>
         </View>
     );
 }
@@ -105,11 +131,25 @@ const styles = StyleSheet.create({
         height: 40,
         marginBottom: 20,
     },
-    picker: {
-        height: 50,
+    categoryPicker: {
+        height: 40,
         width: '100%',
         marginBottom: 20,
+    },
+    timePickerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    timePicker: {
         flex: 1,
+        height: 40,
+    },
+    timeSeparator: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginHorizontal: 5,
+        alignSelf: 'center',
     },
     list: {
         marginTop: 20,
@@ -123,6 +163,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'black',
         marginVertical: 10,
-        marginHorizontal: 80,
+        textAlign: 'center',
     },
 });

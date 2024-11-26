@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ScrollView, View, Button, StyleSheet } from 'react-native';
+import { Image, ScrollView, View, Button, StyleSheet, Text } from 'react-native';
 
 const HomeScreen = ({ navigation, route }) => {
     const { deletedCount } = route.params || { deletedCount: 0 };
@@ -12,6 +12,10 @@ const HomeScreen = ({ navigation, route }) => {
                 <Image source={require("../assets/skyBG.png")} style={styles.skyLayer} />
                 <Image source={require("../assets/skyBG.png")} style={styles.skyLayer} />
                 <Image source={require("../assets/forestBG.jpg")} style={styles.forestLayer} />
+            </View>
+
+            <View style={styles.logoWrapper}>
+                <Text style={styles.logoText}>LifeSync</Text>
             </View>
 
             <View style={[styles.rocketWrapper, { bottom: 50 }]}>
@@ -42,6 +46,21 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 600,
         resizeMode: 'cover',
+    },
+    logoWrapper: {
+        position: 'absolute',
+        top: '40%',
+        width: '100%',
+        alignItems: 'center',
+        zIndex: 2,
+    },
+    logoText: {
+        fontSize: 36,
+        fontWeight: 'bold',
+        color: 'white',
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 10,
     },
     rocketWrapper: {
         position: 'absolute',
